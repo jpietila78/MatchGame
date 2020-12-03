@@ -38,7 +38,13 @@ namespace MatchGame
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            tentsOfSecondsElapsed++;
+            timeTextBlock.Text = (tentsOfSecondsElapsed / 10F).ToString("0.0s");
+            if (matchesFound == 8)
+            {
+                timer.Stop();
+                timeTextBlock.Text = timeTextBlock.Text + " - Play again?";
+            }
         }
 
         private void SetUpGame()
@@ -59,11 +65,17 @@ namespace MatchGame
 
             foreach (TextBlock textblock in mainGrid.Children.OfType<TextBlock>())
             {
-                int index = random.Next(animalEmoji.Count);
-                string nextmEmoji = animalEmoji[index];
-                textblock.Text = nextmEmoji;
-                animalEmoji.RemoveAt(index);
+                if (textblock.Name != "timeTextBlock")
+                {
+                    int index = random.Next(animalEmoji.Count);
+                    string nextmEmoji = animalEmoji[index];
+                    textblock.Text = nextmEmoji;
+                    animalEmoji.RemoveAt(index);
+                }
             }
+            timer.Start();
+            tentsOfSecondsElapsed = 0;
+            matchesFound = 0;
         }
 
         TextBlock lastTextBlockClicked;
@@ -81,6 +93,7 @@ namespace MatchGame
 
             else if (textBlock.Text == lastTextBlockClicked.Text)
             {
+                matchesFound++;
                 textBlock.Visibility = Visibility.Hidden;
                 findingMatch = false;
             }
@@ -88,6 +101,14 @@ namespace MatchGame
             {
                 lastTextBlockClicked.Visibility = Visibility.Visible;
                 findingMatch = false;
+            }
+        }
+
+        private void timeTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (matchesFound == 8)
+            {
+                SetUpGame();
             }
         }
     }
