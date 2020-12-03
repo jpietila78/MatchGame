@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace MatchGame
 {
@@ -20,10 +21,24 @@ namespace MatchGame
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        DispatcherTimer timer = new DispatcherTimer();
+        int tentsOfSecondsElapsed;
+        int matchesFound;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += Timer_Tick;
+
             SetUpGame();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void SetUpGame()
@@ -48,6 +63,31 @@ namespace MatchGame
                 string nextmEmoji = animalEmoji[index];
                 textblock.Text = nextmEmoji;
                 animalEmoji.RemoveAt(index);
+            }
+        }
+
+        TextBlock lastTextBlockClicked;
+        bool findingMatch = false;
+
+        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TextBlock textBlock = sender as TextBlock;
+            if (findingMatch == false)
+            {
+                textBlock.Visibility = Visibility.Hidden;
+                lastTextBlockClicked = textBlock;
+                findingMatch = true;
+            }
+
+            else if (textBlock.Text == lastTextBlockClicked.Text)
+            {
+                textBlock.Visibility = Visibility.Hidden;
+                findingMatch = false;
+            }
+            else
+            {
+                lastTextBlockClicked.Visibility = Visibility.Visible;
+                findingMatch = false;
             }
         }
     }
