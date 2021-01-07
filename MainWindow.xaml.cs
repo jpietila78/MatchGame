@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +26,7 @@ namespace MatchGame
         DispatcherTimer timer = new DispatcherTimer();
         int tentsOfSecondsElapsed;
         int matchesFound;
+        int nomatch;
 
         public MainWindow()
         {
@@ -70,6 +72,7 @@ namespace MatchGame
                     int index = random.Next(animalEmoji.Count);
                     string nextmEmoji = animalEmoji[index];
                     textblock.Text = nextmEmoji;
+                    textblock.Foreground = textblock.Background;
                     animalEmoji.RemoveAt(index);
                 }
             }
@@ -81,27 +84,47 @@ namespace MatchGame
         TextBlock lastTextBlockClicked;
         bool findingMatch = false;
 
-        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        private  void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             TextBlock textBlock = sender as TextBlock;
             if (findingMatch == false)
             {
-                textBlock.Visibility = Visibility.Hidden;
+               
                 lastTextBlockClicked = textBlock;
+                //textBlock.Visibility = Visibility.Visible;
+                textBlock.Foreground = Brushes.Black;
                 findingMatch = true;
+                nomatch = 0;
             }
 
             else if (textBlock.Text == lastTextBlockClicked.Text)
             {
                 matchesFound++;
-                textBlock.Visibility = Visibility.Hidden;
+                //textBlock.Visibility = Visibility.Visible;
+                textBlock.Foreground = Brushes.Black;
                 findingMatch = false;
+                nomatch = 1;
             }
             else
             {
-                lastTextBlockClicked.Visibility = Visibility.Visible;
-                findingMatch = false;
+                textBlock.Foreground = Brushes.Black;
+                lastTextBlockClicked.Foreground = Brushes.Black;
+                nomatch = 1;
+                //lastTextBlockClicked.Visibility = Visibility.Hidden;                
             }
+
+            if (nomatch == 1)
+            {
+                nollaaAsync(textBlock);
+            }
+            
+        }
+        private async Task nollaaAsync(TextBlock textBlock)
+        {
+            await Task.Delay(500);
+            lastTextBlockClicked.Foreground = lastTextBlockClicked.Background;
+            textBlock.Foreground = textBlock.Background;
+            findingMatch = false;
         }
 
         private void timeTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
